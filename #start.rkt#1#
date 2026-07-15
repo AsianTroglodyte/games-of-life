@@ -1,0 +1,7 @@
+#lang racket
+(require racket/draw)
+
+(display "Hello World\n")
+
+(define target (make-bitmap 30 30))
+(define dc (new bitmap-dc% [bitmap target]))
