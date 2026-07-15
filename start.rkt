@@ -1,4 +1,8 @@
 #lang slideshow
+(require pict/flash)
+(require slideshow/code)
+(require racket/class
+         racket/gui/base)
 
 (define c (circle 10))
 (define r (rectangle 10 20))
@@ -49,22 +53,45 @@
 
 (series (rgb-maker circle))
 
-;; (series ())
-;; (require racket/draw)
+(list (circle 10) (square 10))
 
-;; (display "Hello World\n")
+(define (rainbow p)
+  (map (lambda (color)
+         (colorize p color))
+       (list "red" "orange" "yellow" "green" "blue" "purple")))
 
-;; (define target (make-bitmap 30 30))
-;; (define dc (new bitmap-dc% [bitmap target]))
+(apply vc-append
+       (rainbow (filled-rectangle 100 10)))
 
-;; (send dc draw-rectangle
-;;       0 10
-;;       30 10)
+(filled-flash 40 30)
 
-;; (send dc draw-line
-;;       0 0
-;;       30 30)
+(code (circle 10))
 
-;; (send dc draw-line
-;;       0 0
-;;       30 30)xs
+;; MACROS!!! super cool
+(define-syntax pict+code
+  (syntax-rules ()
+    [(pict+code expr)
+     (hc-append 10
+                expr
+                (code expr))]))
+
+(pict+code (circle 100))
+
+(define f (new frame% [label "My Art"]
+               [width 300]
+               [height 300]
+               [alignment '(center center)]))
+
+(send f show #t)
+
+(define (add-drawing p)
+  (let
+      ([drawer (make-pict-drawer p)])
+      (new canvas%
+           [parent f]
+           [style '(border)]
+           [paint-callback (lambda (self dc)
+                             (drawer dc 0 0))])))
+
+(add-drawing (pict+code (circle 10)))
+(add-drawing (colorize (filled-flash 50 30) "yellow"))
