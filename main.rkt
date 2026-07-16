@@ -83,26 +83,31 @@
 (send dc set-pen "gray" 1 'solid)
 
 
-(define (draw-grid cell-size-px
-                   x-pos
-                   y-pos)
+(define (draw-cell
+         cell-size-px
+         x-pos
+         y-pos)
   (send dc draw-rectangle
       x-pos y-pos
       cell-size-px cell-size-px))
 
-(for ([row grid]
-      [i (in-naturals)])
-  (for ([item row]
-        [j (in-naturals)])
-    (let* ([x-pos (* j cell-size-px)]
+(define test-grid (list
+               (list 0 0 1)
+               (list 1 1 0)
+               (list 1 1 0)))
+
+(define (draw-grid grid dc)
+  (for ([row grid] [i (in-naturals)])
+    (for ([cell row] [j (in-naturals)])
+      (let*
+          ([x-pos (* j cell-size-px)]
            [y-pos (* i cell-size-px)])
-      (display x-pos )
-      (display y-pos )
-      (display " ")
-      (draw-grid cell-size-px x-pos y-pos)))
-  (displayln ""))
+        (if (= cell 0)
+            (send dc set-brush "beige" 'solid)
+            (send dc set-brush "black" 'solid))
+        (draw-cell cell-size-px x-pos y-pos)))))
 
-
+(draw-grid test-grid dc)
 
 game-canvas
 
