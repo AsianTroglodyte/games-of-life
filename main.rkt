@@ -10,7 +10,7 @@
 (define window (new frame%
                     [label "Conway's Game of Life"]
                     [width 300]
-                    [height 300]
+                    [height 400]
                     [alignment '(center center)]))
 
 (define main (new vertical-panel%
@@ -28,9 +28,10 @@
       (lambda (button event)
         (send msg set-label "Button click"))])
 
+(struct cell-point (x y))
 
 (define grid-size-cells 10)   ; plural because the unit is "cells"
-(define cell-size-px 10)
+(define cell-size-px 30)
 (define grid-size-px
   (* grid-size-cells cell-size-px))
 
@@ -42,6 +43,8 @@
 (send dc set-brush "beige" 'solid)
 (send dc set-pen "gray" 1 'solid)
 
+(define grid
+  (create-grid grid-size-cells))
 
 (define (draw-cell
          cell-size-px
@@ -67,7 +70,14 @@
             (send dc set-brush "black" 'solid))
         (draw-cell cell-size-px x-pos y-pos)))))
 
-(draw-grid test-grid dc)
+(draw-grid grid dc)
+
+(define (cell x-pos y-pos)
+  (let*
+      ([x-coord (modulo x-pos )]
+       [y-coord (modulo y-pos)]
+       [pointed-cell (cell-point x-coord y-coord)])
+  (displayln pointed-cell)))
 
 ;; game-canvas
 (define game-canvas%
@@ -75,18 +85,25 @@
     (super-new)
     (define/override (on-event evt)
       (when (send evt button-down?)
-        (send msg set-label
-              (format "Clicked at ~a, ~a"
-                      (send evt get-x)
-                      (send evt get-y)))))))
+        (let
+            ([cell-col (quotient (send evt get-x) cell-size-px)]
+             [cell-row (quotient (send evt get-y) cell-size-px)])
+          (send msg set-label
+                (format "Clicked at ~a, ~a"
+                        ;; (send evt get-x)
+                        ;; (send evt get-y)
+                        cell-col
+                        cell-row)))))))
 
 (new game-canvas%
      [parent main]
      [style '(border)]
      [paint-callback
       (lambda (canvas dc)
-        (send dc set-scale 3 3)
+        (send dc set-scale 1 1)
         (send dc set-text-foreground "white")
         (send dc draw-bitmap game-canvas 0 0))])
+
+
 
 (send window show #t)
