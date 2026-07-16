@@ -44,16 +44,17 @@
 (send dc set-pen "gray" 1 'solid)
 
 (define grid
-  (make-list grid-size-cells
-             (make-list grid-size-cells 0)))
+  (create-grid grid-size-cells))
 
-(define (draw-cell
-         cell-size-px
-         x-pos
-         y-pos)
+(define (draw-cell dc
+                   cell-size-px
+                   x-pos
+                   y-pos)
   (send dc draw-rectangle
-      x-pos         y-pos
-      cell-size-px  cell-size-px))
+        x-pos
+        y-pos
+        cell-size-px
+        cell-size-px))
 
 (define test-grid (list
                (list 0 0 1)
@@ -69,7 +70,7 @@
         (if (= cell 0)
             (send dc set-brush "beige" 'solid)
             (send dc set-brush "black" 'solid))
-        (draw-cell cell-size-px x-pos y-pos)))))
+        (draw-cell dc cell-size-px x-pos y-pos)))))
 
 (draw-grid grid dc)
 
@@ -80,12 +81,18 @@
        [pointed-cell (cell-point x-coord y-coord)])
   (displayln pointed-cell)))
 
-(define (cell-click-handler grid cell-col cell-row )
+(define (get-new-grid-state grid cell-row cell-col)
   (for/list ([row grid] [i (in-naturals)])
     (for/list ([cell row] [j (in-naturals)])
       (if (and  (= i cell-row) (= j cell-col))
           (if (zero? cell) 1 0)
           cell))))
+
+;; Calculates new state of grid on click
+(define (cell-click-handler cell-row cell-col)
+  (set! grid (get-new-grid-state grid cell-row cell-col))
+  (draw-grid grid dc)
+  (send game-canvas-view refresh))
 
 ;; game-canvas
 (define game-canvas%
@@ -97,13 +104,14 @@
             ([cell-col (quotient (send evt get-x) cell-size-px)]
              [cell-row (quotient (send evt get-y) cell-size-px)])
             (begin
-              (displayln (cell-click-handler grid cell-col cell-row))
+              (cell-click-handler cell-row cell-col)
               (send msg set-label
                     (format "Clicked at ~a, ~a"
                             ;; (send evt get-x)
                             ;; (send evt get-y)
                             cell-col
                             cell-row))))))))
+
 (define game-canvas-view
   (new game-canvas%
        [parent main]

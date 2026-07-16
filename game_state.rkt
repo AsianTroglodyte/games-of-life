@@ -6,7 +6,9 @@
 (define some-list (list 1 2 3 4))
 
 (define (create-grid n)
-  (make-list n (make-list n 0)))
+  (for/list ([i (in-range n)])
+    (for/list ([j (in-range n)])
+      0)))
 
 (define grid-4 (create-grid 20))
 
