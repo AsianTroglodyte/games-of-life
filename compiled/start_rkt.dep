@@ -1,0 +1,1 @@
+("9.2" ta6le ("57730c13301c8a92c5cf7e4d158dfa4ae735a7a1" . "72e295426d79bf581e2cf9b5f80c872090293adf") (collects #"pict" #"flash.rkt") (collects #"racket" #"class.rkt") (collects #"racket" #"gui" #"base.rkt") (collects #"racket" #"runtime-config.rkt") (collects #"slideshow" #"code.rkt") (collects #"slideshow" #"main.rkt"))

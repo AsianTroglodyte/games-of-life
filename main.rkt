@@ -44,7 +44,8 @@
 (send dc set-pen "gray" 1 'solid)
 
 (define grid
-  (create-grid grid-size-cells))
+  (make-list grid-size-cells
+             (make-list grid-size-cells 0)))
 
 (define (draw-cell
          cell-size-px
@@ -79,6 +80,13 @@
        [pointed-cell (cell-point x-coord y-coord)])
   (displayln pointed-cell)))
 
+(define (cell-click-handler grid cell-col cell-row )
+  (for/list ([row grid] [i (in-naturals)])
+    (for/list ([cell row] [j (in-naturals)])
+      (if (and  (= i cell-row) (= j cell-col))
+          (if (zero? cell) 1 0)
+          cell))))
+
 ;; game-canvas
 (define game-canvas%
   (class canvas%
@@ -88,22 +96,25 @@
         (let
             ([cell-col (quotient (send evt get-x) cell-size-px)]
              [cell-row (quotient (send evt get-y) cell-size-px)])
-          (send msg set-label
-                (format "Clicked at ~a, ~a"
-                        ;; (send evt get-x)
-                        ;; (send evt get-y)
-                        cell-col
-                        cell-row)))))))
+            (begin
+              (displayln (cell-click-handler grid cell-col cell-row))
+              (send msg set-label
+                    (format "Clicked at ~a, ~a"
+                            ;; (send evt get-x)
+                            ;; (send evt get-y)
+                            cell-col
+                            cell-row))))))))
+(define game-canvas-view
+  (new game-canvas%
+       [parent main]
+       [style '(border)]
+       [paint-callback
+        (lambda (canvas dc)
+          (send dc set-scale 1 1)
+          (send dc set-text-foreground "white")
+          (send dc draw-bitmap game-canvas 0 0))]))
 
-(new game-canvas%
-     [parent main]
-     [style '(border)]
-     [paint-callback
-      (lambda (canvas dc)
-        (send dc set-scale 1 1)
-        (send dc set-text-foreground "white")
-        (send dc draw-bitmap game-canvas 0 0))])
-
+(send game-canvas-view set-cursor (make-object cursor% 'hand))
 
 
 (send window show #t)

@@ -87,11 +87,14 @@
 (define (add-drawing p)
   (let
       ([drawer (make-pict-drawer p)])
-      (new canvas%
-           [parent f]
-           [style '(border)]
-           [paint-callback (lambda (self dc)
-                             (drawer dc 0 0))])))
+      (define c
+        (new canvas%
+             [parent f]
+             [style '(border)]
+             [paint-callback (lambda (self dc)
+                               (drawer dc 0 0))]))
+      (send c set-cursor (make-object cursor% 'hand))
+      c))
 
 (add-drawing (pict+code (circle 10)))
 (add-drawing (colorize (filled-flash 50 30) "yellow"))
